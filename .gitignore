@@ -55,3 +55,11 @@ test-results/
 # Misc
 cookies.txt
 plan.md
+
+# AI agent configs
+AGENTS.md
+CLAUDE.md
+opencode.jsonc
+
+# Unused public assets
+public/*.svg
