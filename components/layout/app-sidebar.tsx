@@ -30,7 +30,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        "hidden w-64 shrink-0 flex-col border-r bg-sidebar lg:flex",
+        "sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-r bg-sidebar lg:flex",
         className
       )}
     >
