@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/search-input";
+import { FilterSelect } from "@/components/filter-select";
 import { CustomerList } from "@/features/customers/customer-list";
 import { Button } from "@/components/ui/button";
+import { CUSTOMER_SOURCES, CUSTOMER_STATUSES } from "@/constants";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
@@ -25,8 +27,21 @@ export default function CustomersPage({
           </Button>
         }
       />
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <SearchInput placeholder="Search customers..." />
+        <FilterSelect
+          param="status"
+          allLabel="All statuses"
+          options={CUSTOMER_STATUSES}
+        />
+        <FilterSelect
+          param="source"
+          allLabel="All sources"
+          options={CUSTOMER_SOURCES.map((source) => ({
+            value: source,
+            label: source,
+          }))}
+        />
       </div>
       <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
         <CustomerListWrapper searchParams={searchParams} />
@@ -42,7 +57,9 @@ async function CustomerListWrapper({
 }) {
   const params = await searchParams;
   const search = typeof params.q === "string" ? params.q : undefined;
+  const status = typeof params.status === "string" ? params.status : undefined;
+  const source = typeof params.source === "string" ? params.source : undefined;
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1;
 
-  return <CustomerList search={search} page={page} />;
+  return <CustomerList search={search} status={status} source={source} page={page} />;
 }

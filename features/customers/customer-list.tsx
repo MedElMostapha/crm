@@ -10,11 +10,18 @@ import { Plus } from "lucide-react";
 
 interface CustomerListProps {
   search?: string;
+  status?: string;
+  source?: string;
   page?: number;
 }
 
-export async function CustomerList({ search, page = 1 }: CustomerListProps) {
-  const result = await getCustomers(search, page);
+export async function CustomerList({
+  search,
+  status,
+  source,
+  page = 1,
+}: CustomerListProps) {
+  const result = await getCustomers(search, status, source, page);
 
   if (!result.success) {
     return <p className="text-sm text-destructive">{result.error}</p>;

@@ -67,6 +67,24 @@ export async function getDeals(
   }
 }
 
+export async function getPipelineDeals() {
+  try {
+    const deals = await db.query.deal.findMany({
+      orderBy: desc(schema.deal.updatedAt),
+      with: {
+        customer: { with: { company: true } },
+        company: true,
+      },
+    });
+
+    return success(deals);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to fetch pipeline"
+    );
+  }
+}
+
 export async function getDealById(id: string) {
   try {
     const deal = await db.query.deal.findFirst({
@@ -169,5 +187,9 @@ export async function deleteDeal(id: string) {
 }
 
 export async function updateDealStage(id: string, stage: string) {
-  return updateDeal(id, { stage });
+  const defaults: Record<string, number> = {};
+  if (stage === "won") defaults.probability = 100;
+  else if (stage === "lost") defaults.probability = 0;
+
+  return updateDeal(id, { stage, ...defaults });
 }

@@ -1,9 +1,11 @@
 import { Suspense } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/search-input";
+import { FilterSelect } from "@/components/filter-select";
 import { TaskList } from "@/features/tasks/task-list";
 import { TaskViewSwitcher } from "@/features/tasks/task-view-switcher";
 import { Button } from "@/components/ui/button";
+import { TASK_PRIORITIES, TASK_STATUSES } from "@/constants";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
@@ -29,8 +31,18 @@ export default function TasksPage({
           </div>
         }
       />
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <SearchInput placeholder="Search tasks..." />
+        <FilterSelect
+          param="status"
+          allLabel="All statuses"
+          options={TASK_STATUSES}
+        />
+        <FilterSelect
+          param="priority"
+          allLabel="All priorities"
+          options={TASK_PRIORITIES}
+        />
       </div>
       <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
         <TaskListWrapper searchParams={searchParams} />

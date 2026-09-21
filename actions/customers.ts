@@ -9,16 +9,37 @@ import { generateId } from "@/utils";
 import { success, failure } from "@/lib/action-result";
 import { createActivity } from "./activities";
 
-export async function getCustomers(search?: string, page = 1, limit = 10) {
+export async function getCustomers(
+  search?: string,
+  status?: string,
+  source?: string,
+  page = 1,
+  limit = 10
+) {
   try {
-    const where = search
-      ? or(
+    const conditions = [];
+    if (search) {
+      conditions.push(
+        or(
           like(schema.customer.firstName, `%${search}%`),
           like(schema.customer.lastName, `%${search}%`),
-          like(schema.customer.email, `%${search}%`),
-          like(schema.customer.companyId, `%${search}%`)
+          like(schema.customer.email, `%${search}%`)
         )
-      : undefined;
+      );
+    }
+    if (status) {
+      conditions.push(eq(schema.customer.status, status));
+    }
+    if (source) {
+      conditions.push(eq(schema.customer.source, source));
+    }
+
+    const where =
+      conditions.length > 0
+        ? conditions.length === 1
+          ? conditions[0]
+          : sql.join(conditions, sql` and `)
+        : undefined;
 
     const [customers, totalResult] = await Promise.all([
       db.query.customer.findMany({

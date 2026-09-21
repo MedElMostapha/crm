@@ -72,7 +72,7 @@ async function DashboardContent({ range }: { range: DateRange }) {
     getDashboardCharts(range),
     getPipelineAnalytics(),
     getActivities(10),
-    getCustomers(undefined, 1, 5),
+    getCustomers(undefined, undefined, undefined, 1, 5),
     getDeals(undefined, undefined, 1, 5),
     getTasks(undefined, undefined, undefined, 1, 5),
   ]);

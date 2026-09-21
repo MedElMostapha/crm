@@ -12,7 +12,6 @@ import { CUSTOMER_STATUSES } from "@/constants";
 import { CustomerTimeline } from "@/features/customers/customer-timeline";
 import { CustomerNotes } from "@/features/customers/customer-notes";
 import { ActivityWithRelations } from "@/types";
-
 interface CustomerPageProps {
   params: Promise<{ id: string }>;
 }
@@ -79,7 +78,7 @@ export default async function CustomerPage({ params }: CustomerPageProps) {
               <TabsTrigger value="deals">Deals</TabsTrigger>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
-              <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
             </TabsList>
             <TabsContent value="deals" className="space-y-4">
               {customer.deals.length === 0 ? (
@@ -123,9 +122,12 @@ export default async function CustomerPage({ params }: CustomerPageProps) {
             <TabsContent value="notes">
               <CustomerNotes customerId={customer.id} notes={customer.noteList} />
             </TabsContent>
-            <TabsContent value="activity">
+            <TabsContent value="timeline">
               <CustomerTimeline
-                activities={customer.activities as ActivityWithRelations[]}
+                customer={{
+                  ...customer,
+                  activities: customer.activities as ActivityWithRelations[],
+                }}
               />
             </TabsContent>
           </Tabs>

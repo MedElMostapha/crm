@@ -1,13 +1,15 @@
 import { Suspense } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/search-input";
+import { FilterSelect } from "@/components/filter-select";
 import { DealList } from "@/features/deals/deal-list";
 import { DealKanban } from "@/features/deals/deal-kanban";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DEAL_STAGES } from "@/constants";
 import { Plus, LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
-import { getDeals } from "@/actions/deals";
+import { getDeals, getPipelineDeals } from "@/actions/deals";
 
 export default function DealsPage({
   searchParams,
@@ -28,8 +30,13 @@ export default function DealsPage({
           </Button>
         }
       />
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <SearchInput placeholder="Search deals..." />
+        <FilterSelect
+          param="stage"
+          allLabel="All stages"
+          options={DEAL_STAGES}
+        />
       </div>
       <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
         <DealsContent searchParams={searchParams} />
@@ -54,6 +61,9 @@ async function DealsContent({
     return <p className="text-sm text-destructive">{result.error}</p>;
   }
 
+  const pipelineResult = await getPipelineDeals();
+  const pipelineDeals = pipelineResult.success ? pipelineResult.data : [];
+
   return (
     <Tabs defaultValue={view}>
       <TabsList className="mb-4">
@@ -70,7 +80,7 @@ async function DealsContent({
         <DealList search={search} stage={stage} page={page} />
       </TabsContent>
       <TabsContent value="kanban">
-        <DealKanban deals={result.data.deals} />
+        <DealKanban deals={pipelineDeals} />
       </TabsContent>
     </Tabs>
   );
