@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pencil, User, Building2, Calendar, TrendingUp } from "lucide-react";
+import { DealNotes } from "@/features/deals/deal-notes";
+import { DealTimeline } from "@/features/deals/deal-timeline";
+import { Pencil, User, Building2, Calendar, TrendingUp, Percent } from "lucide-react";
 import { formatDate, formatCurrency } from "@/utils";
-import { DEAL_STAGES } from "@/constants";
+import { DEAL_STAGES, TASK_STATUSES } from "@/constants";
 
 interface DealPageProps {
   params: Promise<{ id: string }>;
@@ -29,7 +31,7 @@ export default async function DealPage({ params }: DealPageProps) {
     <div className="space-y-6">
       <PageHeader
         title={deal.title}
-        description="Deal details and related tasks."
+        description="Deal details, notes and activity."
         actions={
           <Button asChild variant="outline">
             <Link href={`/deals/${deal.id}/edit`}>
@@ -53,10 +55,21 @@ export default async function DealPage({ params }: DealPageProps) {
                 {formatCurrency(deal.value)}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
+                <Percent className="h-4 w-4" />
+                {deal.probability}% probability
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <User className="h-4 w-4" />
-                {deal.customer
-                  ? `${deal.customer.firstName} ${deal.customer.lastName}`
-                  : "No customer"}
+                {deal.customer ? (
+                  <Link
+                    href={`/customers/${deal.customer.id}`}
+                    className="transition-colors hover:text-foreground"
+                  >
+                    {deal.customer.firstName} {deal.customer.lastName}
+                  </Link>
+                ) : (
+                  "No customer"
+                )}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Building2 className="h-4 w-4" />
@@ -74,23 +87,47 @@ export default async function DealPage({ params }: DealPageProps) {
           <Tabs defaultValue="tasks">
             <TabsList>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
             </TabsList>
             <TabsContent value="tasks" className="space-y-4">
               {deal.tasks.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No tasks yet.</p>
               ) : (
-                deal.tasks.map((task) => (
-                  <Card key={task.id}>
-                    <CardContent className="p-4">
-                      <p className="font-medium">{task.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {task.status} · Due {formatDate(task.dueDate)}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))
+                deal.tasks.map((task) => {
+                  const status = TASK_STATUSES.find(
+                    (s) => s.value === task.status
+                  );
+                  return (
+                    <Card key={task.id}>
+                      <CardContent className="flex items-center justify-between gap-4 p-4">
+                        <div>
+                          <Link
+                            href={`/tasks/${task.id}`}
+                            className="font-medium transition-colors hover:text-primary"
+                          >
+                            {task.title}
+                          </Link>
+                          <p className="text-sm text-muted-foreground">
+                            {status?.label ?? task.status} · Due{" "}
+                            {formatDate(task.dueDate)}
+                          </p>
+                        </div>
+                        {task.completed && (
+                          <Badge variant="secondary">Completed</Badge>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })
               )}
+            </TabsContent>
+            <TabsContent value="notes">
+              <DealNotes dealId={deal.id} notes={deal.notes} />
+            </TabsContent>
+            <TabsContent value="timeline">
+              <DealTimeline deal={deal} />
             </TabsContent>
             <TabsContent value="activity" className="space-y-4">
               {deal.activities.length === 0 ? (

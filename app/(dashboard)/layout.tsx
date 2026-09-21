@@ -17,9 +17,9 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen">
       <AppSidebar />
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Navbar notifications={notifications} />
-        <main className="flex-1 p-4 lg:p-8">
+        <main className="min-w-0 flex-1 p-4 lg:p-8">
           <div className="mx-auto max-w-7xl animate-[fade-in-up_0.4s_ease-out]">{children}</div>
         </main>
       </div>

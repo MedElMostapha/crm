@@ -12,7 +12,16 @@ import {
 } from "@/components/ui/command";
 import { globalSearch } from "@/actions/search";
 import { SearchResult } from "@/types";
-import { Search, Users, Building2, Target, CheckSquare } from "lucide-react";
+import {
+  Search,
+  Users,
+  Building2,
+  Target,
+  CheckSquare,
+  LayoutDashboard,
+  CalendarDays,
+  Settings,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +31,16 @@ const iconMap = {
   deal: Target,
   task: CheckSquare,
 };
+
+const quickLinks = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Customers", href: "/customers", icon: Users },
+  { label: "Companies", href: "/companies", icon: Building2 },
+  { label: "Deals", href: "/deals", icon: Target },
+  { label: "Tasks", href: "/tasks", icon: CheckSquare },
+  { label: "Calendar", href: "/tasks/calendar", icon: CalendarDays },
+  { label: "Settings", href: "/settings", icon: Settings },
+];
 
 const typeColors: Record<string, string> = {
   customer: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
@@ -77,7 +96,7 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="hidden h-8 items-center gap-2 rounded-lg border bg-muted/50 px-3 text-sm text-muted-foreground transition-all hover:bg-muted hover:text-foreground sm:flex"
+        className="flex h-8 items-center gap-2 rounded-lg border bg-muted/50 px-2.5 text-sm text-muted-foreground transition-all hover:bg-muted hover:text-foreground sm:px-3"
       >
         <Search className="h-3.5 w-3.5" />
         <span className="hidden lg:inline">Search...</span>
@@ -92,17 +111,26 @@ export function CommandPalette() {
           onValueChange={setQuery}
         />
         <CommandList>
-          <CommandEmpty>
-            {isSearching ? (
-              <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-                Searching...
-              </div>
-            ) : (
-              "No results found."
-            )}
-          </CommandEmpty>
-          {results.length > 0 && (
+          {!query.trim() && (
+            <CommandGroup heading="Go to">
+              {quickLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <CommandItem
+                    key={link.href}
+                    onSelect={() => handleSelect(link.href)}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="rounded-lg bg-muted p-1.5 text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5" />
+                    </div>
+                    <span className="font-medium">{link.label}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+          {query.trim() && results.length > 0 && (
             <CommandGroup heading="Results">
               {results.map((result) => {
                 const Icon = iconMap[result.type];
@@ -127,6 +155,16 @@ export function CommandPalette() {
               })}
             </CommandGroup>
           )}
+          <CommandEmpty>
+            {isSearching ? (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                Searching...
+              </div>
+            ) : (
+              "No results found."
+            )}
+          </CommandEmpty>
         </CommandList>
       </CommandDialog>
     </>

@@ -119,7 +119,13 @@ export type Notification = {
   date: Date;
 };
 
-export type TimelineKind = "customer" | "deal" | "task" | "note" | "activity";
+export type TimelineKind =
+  | "customer"
+  | "company"
+  | "deal"
+  | "task"
+  | "note"
+  | "activity";
 
 export type TimelineItem = {
   id: string;
