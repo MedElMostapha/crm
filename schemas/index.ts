@@ -1,9 +1,7 @@
 import { z } from "zod";
 import {
   CUSTOMER_STATUSES,
-  CUSTOMER_SOURCES,
   DEAL_STAGES,
-  INDUSTRIES,
   TASK_PRIORITIES,
   TASK_STATUSES,
 } from "@/constants";

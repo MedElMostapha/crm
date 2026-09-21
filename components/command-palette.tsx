@@ -50,19 +50,18 @@ export function CommandPalette() {
   }, []);
 
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
-
+    const q = query.trim();
     const timeout = setTimeout(async () => {
       setIsSearching(true);
-      const result = await globalSearch(query);
+      const result = q ? await globalSearch(q) : null;
       setIsSearching(false);
-      if (result.success) {
+      if (result?.success) {
         setResults(result.data);
       } else {
-        toast.error(result.error);
+        setResults([]);
+        if (result && !result.success) {
+          toast.error(result.error);
+        }
       }
     }, 200);
 

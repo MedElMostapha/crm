@@ -14,7 +14,6 @@ import { getDeals } from "@/actions/deals";
 import { getTasks } from "@/actions/tasks";
 import {
   Users,
-  TrendingUp,
   Target,
   CheckSquare,
   DollarSign,

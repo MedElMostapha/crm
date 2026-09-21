@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEAL_STAGES } from "@/constants";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { BarChart3 } from "lucide-react";
 
 interface ChartData {
@@ -36,17 +36,14 @@ const PIE_COLORS = [
 ];
 
 const CHART_BLUE = "#6366f1";
-const CHART_AMBER = "#f59e0b";
 const CHART_EMERALD = "#10b981";
-const CHART_ROSE = "#f43f5e";
-const CHART_PURPLE = "#8b5cf6";
 
 export function DashboardCharts({ data }: { data: ChartData | null }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const revenueData = data?.revenue ?? [];
   const customerData = data?.customers ?? [];

@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
-async function login(page: any) {
+async function login(page: Page) {
   await page.goto("/login");
   await page.getByLabel("Email").fill("demo@orbitcrm.dev");
   await page.getByLabel("Password").fill("password123");

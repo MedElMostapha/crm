@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { DealWithRelations } from "@/types";
 import { DEAL_STAGES } from "@/constants";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/utils";
 import { updateDealStage } from "@/actions/deals";

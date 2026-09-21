@@ -1,6 +1,6 @@
 "use server";
 
-import { like, or, desc, sql } from "drizzle-orm";
+import { like, or } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { success, failure } from "@/lib/action-result";

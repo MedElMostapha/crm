@@ -10,8 +10,8 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
-  secret: process.env.AUTH_SECRET,
-  baseURL: process.env.AUTH_URL,
+  secret: process.env.BETTER_AUTH_SECRET ?? process.env.AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL ?? process.env.AUTH_URL,
 });
 
 export type Session = typeof auth.$Infer.Session;
