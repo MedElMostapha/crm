@@ -1,7 +1,5 @@
 import { getCustomers } from "@/actions/customers";
-import { DataTable } from "@/components/data-table";
-import { ExportCsv } from "@/components/export-csv";
-import { customerColumns } from "./customer-columns";
+import { CustomerTable } from "./customer-table";
 import { EmptyState } from "@/components/empty-state";
 import { Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,31 +45,5 @@ export async function CustomerList({
     );
   }
 
-  return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {total} customer{total !== 1 ? "s" : ""} found
-        </p>
-        <ExportCsv
-          data={customers.map((c) => ({
-            Name: `${c.firstName} ${c.lastName}`,
-            Email: c.email,
-            Phone: c.phone,
-            Company: c.company?.name ?? "",
-            Status: c.status,
-            Source: c.source,
-            Tags: c.tags,
-          }))}
-          filename="customers.csv"
-        />
-      </div>
-      <DataTable
-        columns={customerColumns}
-        data={customers}
-        searchColumn="email"
-        searchPlaceholder="Filter by email..."
-      />
-    </div>
-  );
+  return <CustomerTable customers={customers} total={total} />;
 }

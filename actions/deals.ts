@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq, like, or, desc, count, sql } from "drizzle-orm";
+import { eq, like, or, desc, count, sql, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { dealSchema } from "@/schemas";
@@ -182,6 +182,22 @@ export async function deleteDeal(id: string) {
   } catch (error) {
     return failure(
       error instanceof Error ? error.message : "Failed to delete deal"
+    );
+  }
+}
+
+export async function deleteDealsBulk(ids: string[]) {
+  try {
+    if (ids.length === 0) {
+      return failure("No deals selected");
+    }
+
+    await db.delete(schema.deal).where(inArray(schema.deal.id, ids));
+    revalidatePath("/deals");
+    return success(ids.length, `${ids.length} deal${ids.length !== 1 ? "s" : ""} deleted`);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to delete deals"
     );
   }
 }

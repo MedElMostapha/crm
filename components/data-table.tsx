@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -39,6 +40,12 @@ interface DataTableProps<TData, TValue> {
   searchPlaceholder?: string;
   enableColumnVisibility?: boolean;
   pageSize?: number;
+  selectable?: boolean;
+  getRowIdValue?: (row: TData) => string;
+  bulkActions?: (
+    selected: TData[],
+    clearSelection: () => void
+  ) => React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -48,15 +55,40 @@ export function DataTable<TData, TValue>({
   searchPlaceholder = "Filter...",
   enableColumnVisibility = true,
   pageSize = 10,
+  selectable = false,
+  getRowIdValue,
+  bulkActions,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  const selectColumn: ColumnDef<TData, TValue> = {
+    id: "select",
+    enableHiding: false,
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all rows"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label={`Select row ${row.id}`}
+      />
+    ),
+  };
+
   const table = useReactTable({
     data,
-    columns,
+    columns: selectable ? [selectColumn, ...columns] : columns,
+    getRowId: getRowIdValue ? (row) => getRowIdValue(row) : undefined,
+    enableRowSelection: selectable,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -80,6 +112,9 @@ export function DataTable<TData, TValue>({
 
   const currentPage = table.getState().pagination.pageIndex + 1;
   const totalPages = table.getPageCount();
+  const selectedRows = table.getSelectedRowModel().flatRows.map(
+    (row) => row.original
+  );
 
   return (
     <div className="space-y-4">
@@ -215,6 +250,11 @@ export function DataTable<TData, TValue>({
           </Button>
         </div>
       </div>
+      {selectable && selectedRows.length > 0 && (
+        <div>
+          {bulkActions?.(selectedRows, () => table.resetRowSelection())}
+        </div>
+      )}
     </div>
   );
 }

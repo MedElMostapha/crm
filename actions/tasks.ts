@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq, like, or, desc, count, sql, and, gte, lt, lte, asc } from "drizzle-orm";
+import { eq, like, or, desc, count, sql, and, gte, lt, lte, asc, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { taskSchema } from "@/schemas";
@@ -212,6 +212,62 @@ export async function deleteTask(id: string) {
   } catch (error) {
     return failure(
       error instanceof Error ? error.message : "Failed to delete task"
+    );
+  }
+}
+
+export async function completeTasksBulk(ids: string[]) {
+  try {
+    if (ids.length === 0) {
+      return failure("No tasks selected");
+    }
+
+    const toComplete = await db.query.task.findMany({
+      where: and(
+        inArray(schema.task.id, ids),
+        eq(schema.task.completed, false)
+      ),
+    });
+
+    if (toComplete.length > 0) {
+      await db
+        .update(schema.task)
+        .set({ completed: true, status: "done", updatedAt: new Date() })
+        .where(inArray(schema.task.id, toComplete.map((t) => t.id)));
+
+      for (const task of toComplete) {
+        await createActivity({
+          type: "task_completed",
+          description: `Task "${task.title}" was completed`,
+          taskId: task.id,
+        });
+      }
+    }
+
+    revalidatePath("/tasks");
+    return success(
+      toComplete.length,
+      `${toComplete.length} task${toComplete.length !== 1 ? "s" : ""} completed`
+    );
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to complete tasks"
+    );
+  }
+}
+
+export async function deleteTasksBulk(ids: string[]) {
+  try {
+    if (ids.length === 0) {
+      return failure("No tasks selected");
+    }
+
+    await db.delete(schema.task).where(inArray(schema.task.id, ids));
+    revalidatePath("/tasks");
+    return success(ids.length, `${ids.length} task${ids.length !== 1 ? "s" : ""} deleted`);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to delete tasks"
     );
   }
 }

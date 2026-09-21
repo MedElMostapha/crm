@@ -10,6 +10,7 @@ import {
   Building2,
   Target,
   CheckSquare,
+  BarChart3,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -18,6 +19,7 @@ const iconMap: Record<string, React.ElementType> = {
   Building2,
   Target,
   CheckSquare,
+  BarChart3,
 };
 
 interface AppSidebarProps {

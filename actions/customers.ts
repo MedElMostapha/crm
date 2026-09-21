@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq, like, or, and, desc, count, sql } from "drizzle-orm";
+import { eq, like, or, desc, count, sql, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { customerSchema } from "@/schemas";
@@ -164,6 +164,22 @@ export async function deleteCustomer(id: string) {
   }
 }
 
+export async function deleteCustomersBulk(ids: string[]) {
+  try {
+    if (ids.length === 0) {
+      return failure("No customers selected");
+    }
+
+    await db.delete(schema.customer).where(inArray(schema.customer.id, ids));
+    revalidatePath("/customers");
+    return success(ids.length, `${ids.length} customer${ids.length !== 1 ? "s" : ""} deleted`);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to delete customers"
+    );
+  }
+}
+
 export async function getCustomersForSelect() {
   try {
     const customers = await db.query.customer.findMany({
@@ -173,6 +189,88 @@ export async function getCustomersForSelect() {
   } catch (error) {
     return failure(
       error instanceof Error ? error.message : "Failed to fetch customers"
+    );
+  }
+}
+
+export async function importCustomers(rows: unknown[]) {
+  if (rows.length === 0) {
+    return failure("No rows to import");
+  }
+  if (rows.length > 500) {
+    return failure("Max 500 rows per import");
+  }
+
+  try {
+    const companies = await db.query.company.findMany();
+    const companyByName = new Map(
+      companies.map((company) => [
+        company.name.trim().toLowerCase(),
+        company.id,
+      ])
+    );
+
+    const values: (typeof schema.customer.$inferInsert)[] = [];
+    const errors: { row: number; reason: string }[] = [];
+
+    for (const [index, raw] of rows.entries()) {
+      const input = (raw ?? {}) as Record<string, unknown>;
+      const rowNumber = index + 2;
+
+      const firstName = String(input.firstName ?? "").trim();
+      const lastName = String(input.lastName ?? "").trim();
+      const companyName = String(input.company ?? "").trim();
+
+      if (!firstName || !lastName) {
+        errors.push({ row: rowNumber, reason: "First and last name are required" });
+        continue;
+      }
+
+      const parsed = customerSchema.safeParse({
+        firstName,
+        lastName,
+        email: String(input.email ?? "").trim() || null,
+        phone: String(input.phone ?? "").trim() || null,
+        companyId: companyName
+          ? companyByName.get(companyName.toLowerCase()) ?? null
+          : null,
+        status: String(input.status ?? "lead").trim() || "lead",
+        source: String(input.source ?? "").trim() || null,
+        tags: String(input.tags ?? "").trim() || null,
+        notes: String(input.notes ?? "").trim() || null,
+      });
+
+      if (!parsed.success) {
+        errors.push({
+          row: rowNumber,
+          reason: parsed.error.issues[0]?.message ?? "Invalid row",
+        });
+        continue;
+      }
+
+      values.push({ id: generateId(), ...parsed.data });
+    }
+
+    if (values.length > 0) {
+      await db.insert(schema.customer).values(values);
+
+      for (const customer of values) {
+        await createActivity({
+          type: "customer_created",
+          description: `Customer ${customer.firstName} ${customer.lastName} was created`,
+          customerId: customer.id,
+        });
+      }
+    }
+
+    revalidatePath("/customers");
+    return success(
+      { imported: values.length, errors },
+      `${values.length} customer${values.length !== 1 ? "s" : ""} imported`
+    );
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to import customers"
     );
   }
 }

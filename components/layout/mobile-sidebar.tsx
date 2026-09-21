@@ -10,6 +10,7 @@ import {
   Building2,
   Target,
   CheckSquare,
+  BarChart3,
   Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ const iconMap: Record<string, React.ElementType> = {
   Building2,
   Target,
   CheckSquare,
+  BarChart3,
 };
 
 export function MobileSidebar() {

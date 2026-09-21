@@ -14,18 +14,9 @@ import Link from "next/link";
 import { deleteDeal } from "@/actions/deals";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { DEAL_STAGES } from "@/constants";
+import { DEAL_STAGES, STAGE_STYLES } from "@/constants";
 import { formatCurrency, formatDate } from "@/utils";
 import { cn } from "@/lib/utils";
-
-const stageStyles: Record<string, string> = {
-  lead: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20",
-  qualified: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-  proposal: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  negotiation: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-  won: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  lost: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-};
 
 export const dealColumns: ColumnDef<DealWithRelations>[] = [
   {
@@ -61,7 +52,7 @@ export const dealColumns: ColumnDef<DealWithRelations>[] = [
     cell: ({ row }) => {
       const stage = DEAL_STAGES.find((s) => s.value === row.original.stage);
       return (
-        <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize", stageStyles[row.original.stage] ?? "bg-muted text-muted-foreground")}>
+        <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize", STAGE_STYLES[row.original.stage] ?? "bg-muted text-muted-foreground")}>
           {stage?.label ?? row.original.stage}
         </span>
       );

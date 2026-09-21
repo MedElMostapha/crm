@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/search-input";
 import { FilterSelect } from "@/components/filter-select";
 import { CustomerList } from "@/features/customers/customer-list";
+import { CustomerImport } from "@/features/customers/customer-import";
 import { Button } from "@/components/ui/button";
 import { CUSTOMER_SOURCES, CUSTOMER_STATUSES } from "@/constants";
 import { Plus } from "lucide-react";
@@ -19,12 +20,15 @@ export default function CustomersPage({
         title="Customers"
         description="Manage your customer relationships."
         actions={
-          <Button asChild>
-            <Link href="/customers/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Customer
-            </Link>
-          </Button>
+          <>
+            <CustomerImport />
+            <Button asChild>
+              <Link href="/customers/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Customer
+              </Link>
+            </Button>
+          </>
         }
       />
       <div className="flex flex-wrap items-center gap-3">
