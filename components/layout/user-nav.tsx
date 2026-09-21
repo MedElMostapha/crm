@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -60,7 +61,7 @@ export function UserNav() {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-2">
+        <DropdownMenuItem render={<Link href="/settings" />} className="gap-2">
           <User className="h-4 w-4" />
           Profile
         </DropdownMenuItem>
