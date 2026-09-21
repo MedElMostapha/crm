@@ -74,6 +74,49 @@ export type DashboardStats = {
   tasksDueToday: number;
   revenue: number;
   monthlyGrowth: number;
+  trends: {
+    customers: number;
+    revenue: number;
+    activeDeals: number;
+  };
+};
+
+export type DateRange = "30d" | "90d" | "12m" | "ytd";
+
+export type PipelineStageMetric = {
+  stage: DealStage;
+  label: string;
+  color: string;
+  count: number;
+  value: number;
+  forecast: number;
+};
+
+export type PipelineAnalytics = {
+  stages: PipelineStageMetric[];
+  pipelineValue: number;
+  weightedForecast: number;
+  openDeals: number;
+  wonDeals: number;
+  lostDeals: number;
+  winRate: number;
+  avgDealSize: number;
+};
+
+export type NotificationType =
+  | "task_overdue"
+  | "task_due_today"
+  | "deal_stuck"
+  | "deal_closing";
+
+export type Notification = {
+  id: string;
+  type: NotificationType;
+  title: string;
+  description: string;
+  href: string;
+  severity: "danger" | "warning" | "info";
+  date: Date;
 };
 
 export type TimelineItem = {

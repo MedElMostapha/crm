@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/search-input";
 import { TaskList } from "@/features/tasks/task-list";
+import { TaskViewSwitcher } from "@/features/tasks/task-view-switcher";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -17,12 +18,15 @@ export default function TasksPage({
         title="Tasks"
         description="Manage your tasks and follow-ups."
         actions={
-          <Button asChild>
-            <Link href="/tasks/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Task
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <TaskViewSwitcher />
+            <Button asChild>
+              <Link href="/tasks/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Task
+              </Link>
+            </Button>
+          </div>
         }
       />
       <div className="flex items-center gap-4">

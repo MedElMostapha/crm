@@ -62,6 +62,19 @@ export const ACTIVITY_TYPES = [
 
 export const APP_NAME = "Orbit CRM";
 
+export const DATE_RANGES = [
+  { value: "30d", label: "30 days" },
+  { value: "90d", label: "90 days" },
+  { value: "12m", label: "12 months" },
+  { value: "ytd", label: "Year to date" },
+] as const;
+
+export const DEFAULT_DATE_RANGE = "90d";
+
+export const STUCK_DEAL_DAYS = 14;
+
+export const CLOSING_SOON_DAYS = 7;
+
 export const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
   { label: "Customers", href: "/customers", icon: "Users" },

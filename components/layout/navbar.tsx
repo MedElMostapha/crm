@@ -7,6 +7,7 @@ import { MobileSidebar } from "./mobile-sidebar";
 import { ThemeToggle } from "./theme-toggle";
 import { UserNav } from "./user-nav";
 import { CommandPalette } from "@/components/command-palette";
+import { NotificationBell } from "./notification-bell";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,8 +17,9 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Target } from "lucide-react";
+import { type Notification } from "@/types";
 
-export function Navbar() {
+export function Navbar({ notifications }: { notifications: Notification[] }) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
 
@@ -38,6 +40,7 @@ export function Navbar() {
         </div>
         <div className="flex items-center gap-2">
           <CommandPalette />
+          <NotificationBell notifications={notifications} />
           <ThemeToggle />
           <UserNav />
         </div>

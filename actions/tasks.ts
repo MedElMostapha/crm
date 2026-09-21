@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq, like, or, desc, count, sql, and, gte, lt } from "drizzle-orm";
+import { eq, like, or, desc, count, sql, and, gte, lt, lte, asc } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { taskSchema } from "@/schemas";
@@ -66,6 +66,28 @@ export async function getTasks(
   } catch (error) {
     return failure(
       error instanceof Error ? error.message : "Failed to fetch tasks"
+    );
+  }
+}
+
+export async function getCalendarTasks(from: Date, to: Date) {
+  try {
+    const tasks = await db.query.task.findMany({
+      where: and(
+        gte(schema.task.dueDate, from),
+        lte(schema.task.dueDate, to)
+      ),
+      orderBy: asc(schema.task.dueDate),
+      with: {
+        customer: { with: { company: true } },
+        deal: true,
+      },
+    });
+
+    return success(tasks);
+  } catch (error) {
+    return failure(
+      error instanceof Error ? error.message : "Failed to fetch calendar tasks"
     );
   }
 }

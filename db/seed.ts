@@ -78,6 +78,9 @@ function randomDate(start: Date, end: Date) {
   );
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const daysFromNow = (days: number) => new Date(Date.now() + days * DAY_MS);
+
 async function seed() {
   console.log("Seeding database...");
 
@@ -182,10 +185,10 @@ async function seed() {
       value: Math.floor(Math.random() * 100000) + 5000,
       probability: Math.floor(Math.random() * 100),
       stage: pick(DEAL_STAGES).value,
-      expectedCloseDate: randomDate(new Date(), new Date(2026, 11, 31)),
+      expectedCloseDate: randomDate(new Date(), daysFromNow(90)),
       notes: Math.random() > 0.5 ? "Follow up next week" : null,
       createdAt: randomDate(new Date(2024, 0, 1), new Date()),
-      updatedAt: new Date(),
+      updatedAt: randomDate(daysFromNow(-45), new Date()),
     });
   }
   console.log("Created deals");
@@ -209,7 +212,7 @@ async function seed() {
       description: Math.random() > 0.5 ? "Important follow-up" : null,
       priority: pick(TASK_PRIORITIES).value,
       status: pick(TASK_STATUSES).value,
-      dueDate: randomDate(new Date(), new Date(2026, 11, 31)),
+      dueDate: randomDate(daysFromNow(-30), daysFromNow(45)),
       assignedCustomerId,
       assignedDealId,
       completed: Math.random() > 0.7,

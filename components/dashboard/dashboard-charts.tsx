@@ -3,10 +3,12 @@
 import {
   BarChart,
   Bar,
+  ComposedChart,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -23,6 +25,7 @@ import { BarChart3 } from "lucide-react";
 interface ChartData {
   revenue: { month: string; revenue: number }[];
   customers: { month: string; customers: number }[];
+  forecast: { month: string; actual: number; forecast: number }[];
   deals: { lead: number; qualified: number; proposal: number; negotiation: number; won: number; lost: number };
 }
 
@@ -47,6 +50,7 @@ export function DashboardCharts({ data }: { data: ChartData | null }) {
 
   const revenueData = data?.revenue ?? [];
   const customerData = data?.customers ?? [];
+  const forecastData = data?.forecast ?? [];
 
   const dealsData = DEAL_STAGES.map((stage) => ({
     name: stage.label,
@@ -79,6 +83,7 @@ export function DashboardCharts({ data }: { data: ChartData | null }) {
           <TabsList className="mb-6">
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
+            <TabsTrigger value="forecast">Forecast</TabsTrigger>
             <TabsTrigger value="deals">Deals</TabsTrigger>
           </TabsList>
           <TabsContent value="revenue">
@@ -149,6 +154,56 @@ export function DashboardCharts({ data }: { data: ChartData | null }) {
                     activeDot={{ r: 7, strokeWidth: 2, stroke: "hsl(var(--background))", fill: CHART_EMERALD }}
                   />
                 </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </TabsContent>
+          <TabsContent value="forecast">
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={forecastData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted/40" />
+                  <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12, fill: "#888" }} axisLine={false} tickLine={false} />
+                  <YAxis className="text-xs" tick={{ fontSize: 12, fill: "#888" }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    cursor={{ fill: "hsl(var(--muted)/0.3)" }}
+                    contentStyle={{
+                      borderRadius: "0.75rem",
+                      border: "1px solid hsl(var(--border))",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+                      background: "hsl(var(--card))",
+                    }}
+                    formatter={(value) =>
+                      new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        maximumFractionDigits: 0,
+                      }).format(Number(value))
+                    }
+                  />
+                  <Bar
+                    dataKey="actual"
+                    name="Won"
+                    fill={`url(#actualGradient)`}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={48}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="forecast"
+                    name="Weighted forecast"
+                    stroke={CHART_EMERALD}
+                    strokeWidth={3}
+                    strokeDasharray="6 4"
+                    dot={{ r: 4, fill: CHART_EMERALD, strokeWidth: 2, stroke: "hsl(var(--background))" }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <defs>
+                    <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={CHART_BLUE} stopOpacity={0.9} />
+                      <stop offset="100%" stopColor={CHART_BLUE} stopOpacity={0.4} />
+                    </linearGradient>
+                  </defs>
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
           </TabsContent>
